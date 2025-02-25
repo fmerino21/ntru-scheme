@@ -1,4 +1,3 @@
-import numpy as np
 import sympy as sp
 from sympy.abc import x
 from random import shuffle
@@ -107,12 +106,15 @@ class NTRU:
         r = self.gen_ternary_polynomial(N, d, d)
         e = self.poly_mod((h * r) + m, q)
 
-        print("\n---------- Encripcion -------\n")
+        print("\n ------------ Encripcion ------------------\n")
         print("Polinomio aleatorio r: ", r)
 
         return e
 
     def decrypt(self, e, f, f_p_inv):
+        """
+        Algoritmo para desencriptar un texto cifrado
+        """
         N = self.N
         q = self.q
         p = self.p

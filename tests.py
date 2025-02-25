@@ -15,7 +15,6 @@ h, f, g, f_p = ntru.gen_keys()
 m = ntru.gen_ternary_polynomial(N, d, d)
 print("Mensaje original:", m)
 
-print("aaaaa")
 ciphertext = ntru.encrypt(m, h)
 print("Texto cifrado:", ciphertext)
 
