@@ -1,9 +1,7 @@
 import numpy as np
 import sympy as sp
 from sympy.abc import x
-from random import shuffle, seed
-seed(567)
-
+from random import shuffle
 
 
 class NTRU:
@@ -101,12 +99,17 @@ class NTRU:
         """
         Algoritmo para encriptar un mensaje m
         """
+
         N = self.N
         d = self.d
         q = self.q
-
+    
         r = self.gen_ternary_polynomial(N, d, d)
         e = self.poly_mod((h * r) + m, q)
+
+        print("\n---------- Encripcion -------\n")
+        print("Polinomio aleatorio r: ", r)
+
         return e
 
     def decrypt(self, e, f, f_p_inv):
@@ -132,6 +135,4 @@ class NTRU:
         lifted_b = sp.Poly(b_coeffs, x)
 
         return lifted_b
-
-
-
+    
