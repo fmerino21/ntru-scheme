@@ -31,6 +31,7 @@ class NTRU:
         Reduce un polinomio módulo mod_poly en Z_q[x] 
         """
         mod_poly = self.mod_poly
+        mod_poly = sp.Poly(mod_poly, x, domain=sp.GF(q))
         prod = f % mod_poly
         return sp.Poly([coef % q for coef in prod.all_coeffs()], x)
 
@@ -65,12 +66,14 @@ class NTRU:
         print("---------- Generacion de llaves ---------\n")
 
         print("f :", f)
-        print("g :", g)
+        print("g :", g)      
 
         print("\n---------- Inverso de f en Z_p[x] -------\n")
 
         f_p = self.invert_poly_mod_p(f, p)            
-        
+        f = sp.Poly(f.as_expr(), x, modulus=p)  # Mover los coeficientes de f de Z a Z_p
+
+        print("f   :", f)
         print("f_p :", f_p)
 
         print("f_p * f :", self.poly_mod(f * f_p, p))
@@ -79,13 +82,18 @@ class NTRU:
         print("\n---------- Inverso de f en Z_q[x] -------\n")
 
         f_q = self.invert_poly_mod_p(f, q)   
-        
-        print("f_p :", f_q)
+        f = sp.Poly(f.as_expr(), x, modulus=q)  # Mover los coeficientes de f de Z a Z_q
+
+        print("f   :", f)
+        print("f_q :", f_q)
 
         print("f_q * f :", self.poly_mod(f * f_q, q))
 
-        h = self.poly_mod(p * f_q * g, q) 
 
+        g = sp.Poly(g.as_expr(), x, modulus=q) # Mover los coeficientes de g de Z a Z_q
+
+        h = self.poly_mod(p * f_q * g, q) 
+        h = sp.Poly(h.as_expr(), x, modulus=q)  
 
         print("\n---------- Llaves -------\n")
 
@@ -104,7 +112,13 @@ class NTRU:
         q = self.q
     
         r = self.gen_ternary_polynomial(N, d, d)
+
+        # Mover los coeficientes de Z a Z_q   
+        r = sp.Poly(r.as_expr(), x, modulus=q)  
+        m = sp.Poly(m.as_expr(), x, modulus=q) 
+
         e = self.poly_mod((h * r) + m, q)
+        e = sp.Poly(e.as_expr(), x, modulus=q) # Mover los coeficientes de e de Z a Z_q
 
         print("\n ------------ Encripcion ------------------\n")
         print("Polinomio aleatorio r: ", r)
@@ -123,13 +137,14 @@ class NTRU:
         
         print("\n ------------ Desencripcion ------------------\n")
 
-        print("Polinomio a: ")
-        print(a)
+        print("Polinomio a: ", a)
 
         # Centro y aplico modulo q
         center_lift = lambda c, q: (c % q - q) if (c % q > q // 2) else c % q
         a_coeffs = [center_lift(c, q) for c in a.all_coeffs()]
-        lifted_a = sp.Poly(a_coeffs, x)
+
+        lifted_a = sp.Poly(a_coeffs, x) 
+        lifted_a  = sp.Poly(lifted_a.as_expr(), x, modulus=p) # Mover los coeficientes de Z a Z_p       
         
         # Centro y aplico modulo p
         b = self.poly_mod(f_p_inv * lifted_a, p)
